@@ -4,6 +4,8 @@
     <div class="card">
       <div class="card-body">
         <h2 class="card-title text-center mb-4">Todo List</h2>
+        
+        <!-- Task Creation Form -->
         <form action="/add" method="POST" class="mb-4">
           <div class="input-group mb-3">
             <input
@@ -13,11 +15,7 @@
               placeholder="Add a new task"
               required
             />
-            <select
-              name="priority"
-              class="form-select"
-              style="max-width: 150px"
-            >
+            <select name="priority" class="form-select" style="max-width: 150px">
               <option value="medium">Medium</option>
               <option value="low">Low</option>
               <option value="high">High</option>
@@ -29,38 +27,34 @@
           </div>
         </form>
 
+        <!-- Priority Filter (Optional) -->
+        <div class="mb-3 text-center">
+          <div class="btn-group" role="group">
+            <a href="/?filter=all" class="btn btn-outline-secondary">All</a>
+            <a href="/?filter=urgent" class="btn btn-outline-danger">Urgent</a>
+            <a href="/?filter=high" class="btn btn-outline-warning">High</a>
+            <a href="/?filter=medium" class="btn btn-outline-primary">Medium</a>
+            <a href="/?filter=low" class="btn btn-outline-info">Low</a>
+          </div>
+        </div>
+
+        <!-- Task List -->
         <ul class="list-group">
           <% tasks.forEach(task => { %>
-          <li
-            class="list-group-item d-flex justify-content-between align-items-center priority-<%= task.priority %>"
-          >
+          <li class="list-group-item d-flex justify-content-between align-items-center priority-<%= task.priority %>">
             <div class="task-content">
               <span class="task-title"><%= task.title %></span>
-              <span
-                class="badge bg-<%= getPriorityBadgeColor(task.priority) %> ms-2"
-              >
-                <%= task.priority.charAt(0).toUpperCase() +
-                task.priority.slice(1) %>
+              <span class="badge bg-<%= getPriorityBadgeColor(task.priority) %> ms-2">
+                <%= task.priority.charAt(0).toUpperCase() + task.priority.slice(1) %>
               </span>
             </div>
             <div class="task-actions">
-              <a
-                href="/edit/<%= task._id %>"
-                class="btn btn-sm btn-outline-warning me-2"
-                title="Edit"
-              >
+              <a href="/edit/<%= task._id %>" class="btn btn-sm btn-outline-warning me-2" title="Edit">
                 <i class="fas fa-pencil-alt"></i>
               </a>
-              <form
-                action="/tasks/<%= task._id %>?_method=DELETE"
-                method="POST"
-                class="d-inline"
-              >
-                <button
-                  type="submit"
-                  class="btn btn-sm btn-outline-danger"
-                  title="Delete"
-                >
+              <form action="/delete/<%= task._id %>" method="POST" class="d-inline">
+                <input type="hidden" name="_method" value="DELETE">
+                <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
                   <i class="fas fa-trash-alt"></i>
                 </button>
               </form>
