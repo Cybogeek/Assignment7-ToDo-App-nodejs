@@ -4,12 +4,13 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index"
   },
   "keywords": [],
-  "author": "",
+  "author": "Sukant @ Cybogeek",
   "license": "ISC",
-  "description": "",
+  "description": "A Basic TODO App with NodeJs",
   "dependencies": {
     "body-parser": "^1.20.3",
     "ejs": "^3.1.10",
