@@ -21,8 +21,25 @@ app.set("views", path.join(__dirname, "views"));
 let tasks = [];
 
 // Routes
-app.get("/", (req, res) => {
-  res.render("index", { tasks });
+app.get("/", async (req, res) => {
+  try {
+    const tasks = await Task.find().sort({ createdAt: -1 });
+    res.render("index", {
+      tasks,
+      getPriorityBadgeColor: (priority) => {
+        const colors = {
+          low: "info",
+          medium: "primary",
+          high: "warning",
+          urgent: "danger",
+        };
+        return colors[priority] || "secondary";
+      },
+    });
+  } catch (err) {
+    console.error("Error fetching tasks:", err);
+    res.status(500).render("error", { message: "Failed to load tasks" });
+  }
 });
 
 app.post("/add", (req, res) => {
@@ -40,7 +57,7 @@ app.get("/edit/:id", (req, res) => {
   res.render("edit", { taskId, task });
 });
 
-app.post("/edit/:id", (req, res) => {
+app.put("/edit/:id", (req, res) => {
   const taskId = req.params.id;
   if (req.body.task && req.body.task.trim().length > 0) {
     tasks[taskId] = req.body.task.trim();
@@ -48,7 +65,7 @@ app.post("/edit/:id", (req, res) => {
   res.redirect("/");
 });
 
-app.get("/delete/:id", (req, res) => {
+app.delete("/delete/:id", (req, res) => {
   const taskId = req.params.id;
   tasks.splice(taskId, 1);
   res.redirect("/");
