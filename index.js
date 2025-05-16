@@ -17,57 +17,70 @@ app.use(methodOverride("_method"));
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
-// In-memory data store
+// In-memory data store with proper task structure
 let tasks = [];
 
+// Helper function to generate unique IDs
+const generateId = () => Date.now().toString();
+
 // Routes
-app.get("/", async (req, res) => {
-  try {
-    const tasks = await Task.find().sort({ createdAt: -1 });
-    res.render("index", {
-      tasks,
-      getPriorityBadgeColor: (priority) => {
-        const colors = {
-          low: "info",
-          medium: "primary",
-          high: "warning",
-          urgent: "danger",
-        };
-        return colors[priority] || "secondary";
-      },
-    });
-  } catch (err) {
-    console.error("Error fetching tasks:", err);
-    res.status(500).render("error", { message: "Failed to load tasks" });
-  }
+app.get("/", (req, res) => {
+  res.render("index", {
+    tasks,
+    getPriorityBadgeColor: (priority) => {
+      const colors = {
+        low: "info",
+        medium: "primary",
+        high: "warning",
+        urgent: "danger",
+      };
+      return colors[priority] || "secondary";
+    },
+  });
 });
 
 app.post("/add", (req, res) => {
-  const newTask = req.body.task;
-  if (newTask && newTask.trim().length > 0) {
-    tasks.push(newTask.trim());
+  const { title, priority } = req.body;
+  if (title && title.trim().length > 0) {
+    tasks.push({
+      _id: generateId(),
+      title: title.trim(),
+      priority: priority || 'medium',
+      createdAt: new Date()
+    });
   }
-
   res.redirect("/");
 });
 
 app.get("/edit/:id", (req, res) => {
   const taskId = req.params.id;
-  const task = tasks[taskId];
-  res.render("edit", { taskId, task });
+  const task = tasks.find(t => t._id === taskId);
+  if (!task) return res.redirect("/");
+  
+  res.render("edit", { task });
 });
 
 app.put("/edit/:id", (req, res) => {
   const taskId = req.params.id;
-  if (req.body.task && req.body.task.trim().length > 0) {
-    tasks[taskId] = req.body.task.trim();
+  const { title, priority } = req.body;
+  
+  const taskIndex = tasks.findIndex(t => t._id === taskId);
+  if (taskIndex === -1) return res.redirect("/");
+  
+  if (title && title.trim().length > 0) {
+    tasks[taskIndex] = {
+      ...tasks[taskIndex],
+      title: title.trim(),
+      priority: priority || tasks[taskIndex].priority
+    };
   }
+  
   res.redirect("/");
 });
 
 app.delete("/delete/:id", (req, res) => {
   const taskId = req.params.id;
-  tasks.splice(taskId, 1);
+  tasks = tasks.filter(task => task._id !== taskId);
   res.redirect("/");
 });
 
