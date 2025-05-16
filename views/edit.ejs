@@ -1,0 +1,23 @@
+<%- include("./partials/header")%>
+<div class="container mt-5">
+  <div class="col-md-6 mx-auto">
+    <div class="card">
+      <div class="card-body">
+        <h2 class="card-title">Edit Task</h2>
+        <form action="/edit/<%= taskId %>" method="POST" class="mb-3">
+          <div class="input-group">
+            <input
+              type="text"
+              name="task"
+              class="form-control"
+              value="<%= task %>"
+              required
+            />
+            <button type="submit" class="btn btn-success">Update</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<%- include("./partials/footer")%>
